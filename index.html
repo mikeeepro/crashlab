@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>CrashLab Pro</title>
+<style>
+:root{--bg:#05080f;--card:#0d1424;--line:#1b2740;--txt:#e9f1fb;--dim:#6b7d99;
+--acc:#00ffa3;--cyan:#22d3ee;--warn:#fbbf24;--bad:#ff4d6d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);
+font:16px/1.45 -apple-system,system-ui,Roboto,sans-serif;
+padding:0 14px 90px;max-width:520px;margin:0 auto;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(ellipse at 50% 0%,rgba(0,255,163,.09),transparent 60%),
+radial-gradient(ellipse at 90% 90%,rgba(34,211,238,.07),transparent 55%)}
+.wrap{position:relative;z-index:1}
+h1{font-size:20px;margin:0;letter-spacing:-.5px;font-weight:800}
+h1 i{color:var(--acc);font-style:normal}
+.sub{color:var(--dim);font-size:11.5px;letter-spacing:.4px;margin:2px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;
+padding:15px;margin-bottom:11px;position:relative;overflow:hidden}
+.card.edge::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+.lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
+margin-bottom:10px;font-weight:700}
+.big{font-size:54px;font-weight:800;letter-spacing:-3px;text-align:center;
+font-variant-numeric:tabular-nums;line-height:1}
+.xt{color:var(--acc)}
+.chip{text-align:center;font-size:12.5px;font-weight:800;padding:8px;border-radius:9px;
+margin-top:11px;letter-spacing:.3px}
+.ok{background:rgba(0,255,163,.13);color:var(--acc)}
+.mid{background:rgba(251,191,36,.13);color:var(--warn)}
+.no{background:rgba(255,77,109,.13);color:var(--bad)}
+.row{display:flex;justify-content:space-between;padding:9px 0;font-size:13.5px;
+border-bottom:1px solid rgba(255,255,255,.045)}
+.row:last-child{border:0}.row b{font-variant-numeric:tabular-nums}
+.row span{color:var(--dim)}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:#080d18;
+border-top:1px solid var(--line);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;background:none;border:0;color:var(--dim);padding:13px 2px 15px;
+font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer}
+.tabs button.on{color:var(--acc)}
+.tabs button.on::before{content:"";display:block;height:2px;width:26px;margin:0 auto 7px;
+background:var(--acc);border-radius:2px;box-shadow:0 0 12px var(--acc)}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.pad button{background:#152137;border:1px solid var(--line);color:var(--txt);
+padding:15px 2px;border-radius:11px;font-size:13.5px;font-weight:700;cursor:pointer}
+.pad button:active{background:var(--acc);color:#04140f;box-shadow:0 0 22px rgba(0,255,163,.5)}
+.add{display:flex;gap:7px;margin-top:9px}
+.add input{flex:1;background:#0a1120;border:1px solid var(--line);color:var(--txt);
+padding:14px;border-radius:11px;font-size:16px;min-width:0}
+.add button{background:var(--acc);color:#04140f;border:0;padding:0 22px;
+border-radius:11px;font-weight:900;cursor:pointer}
+.hist{display:flex;flex-wrap:wrap;gap:6px;max-height:150px;overflow:auto}
+.hist span{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:7px;
+background:#152137;font-variant-numeric:tabular-nums}
+.hist span.hi{background:rgba(255,77,109,.18);color:#ffb3c1}
+.hist span.lo{background:rgba(0,255,163,.13);color:var(--acc)}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tg button{background:#152137;border:1px solid var(--line);color:var(--dim);
+padding:13px 4px;border-radius:11px;font-size:12.5px;font-weight:700;cursor:pointer}
+.tg button.on{background:rgba(0,255,163,.12);border-color:var(--acc);color:var(--acc)}
+.ghost{width:100%;background:none;border:1px solid var(--line);color:var(--dim);
+padding:14px;border-radius:12px;font-size:13.5px;font-weight:700;cursor:pointer}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px;
+animation:pl 1.5s infinite}
+@keyframes pl{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,163,.6)}
+50%{opacity:.45;box-shadow:0 0 0 6px rgba(0,255,163,0)}}
+.dot.g{background:var(--acc)}.dot.r{background:var(--bad)}
+.dot.a{background:var(--warn)}
+.bar{height:8px;background:#152137;border-radius:5px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--acc)}
+.dist{margin-bottom:10px}
+.dist .top{display:flex;justify-content:space-between;font-size:12px;color:var(--dim)}
+.warn{font-size:11.5px;color:var(--dim);line-height:1.55;margin-top:11px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.hide{display:none!important}
+.auth{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:20px 0}
+.brand{font-size:31px;font-weight:900;letter-spacing:-1.5px;margin-bottom:4px}
+.brand i{color:var(--acc);font-style:normal;text-shadow:0 0 24px rgba(0,255,163,.7)}
+.fld{margin-bottom:10px}
+.fld label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;
+color:var(--dim);font-weight:700;display:block;margin-bottom:6px}
+.fld input{width:100%;background:#0a1120;border:1px solid var(--line);color:var(--txt);
+padding:15px;border-radius:12px;font-size:16px}
+.go{width:100%;background:var(--acc);color:#04140f;border:0;padding:17px;
+border-radius:13px;font-size:15px;font-weight:900;letter-spacing:.4px;cursor:pointer;
+margin-top:8px;box-shadow:0 6px 26px rgba(0,255,163,.28)}
+.pill{font-size:9.5px;border:1px solid var(--line);color:var(--dim);padding:3px 8px;
+border-radius:20px;display:inline-block;margin-right:5px;letter-spacing:.4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- AUTH -->
+<div id="auth" class="auth">
+  <div class="brand">Crash<i>Lab</i> Pro</div>
+  <div class="sub">AVIATOR INTELLIGENCE · KENYA</div>
+  <div style="margin-bottom:16px">
+    <span class="pill">REAL ODDS</span><span class="pill">AUTO CASHOUT</span>
+    <span class="pill">ON-DEVICE</span>
+  </div>
+  <div class="card edge">
+    <div class="lbl">Create your profile</div>
+    <div class="fld"><label>Trader name</label>
+      <input id="aName" placeholder="e.g. Brian" maxlength="18"></div>
+    <div class="fld"><label>Starting bankroll (KES)</label>
+      <input id="aBank" type="number" inputmode="numeric" placeholder="1000"></div>
+    <div class="fld"><label>Stake per round (KES)</label>
+      <input id="aStake" type="number" inputmode="numeric" placeholder="50"></div>
+    <button class="go" id="aGo">ENTER THE LAB</button>
+    <div class="warn">No server, no signup, no subscription. Everything stays on this phone.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hide">
+  <div style="padding:16px 0 12px">
+    <h1>Crash<i>Lab</i> Pro</h1>
+    <div class="sub" id="whoami">—</div>
+  </div>
+
+  <!-- HOME -->
+  <div id="tHome">
+    <div class="card">
+      <div class="lbl">Connection</div>
+      <div class="row"><span>Engine</span>
+        <b style="color:var(--acc)"><span class="dot g"></span>LIVE</b></div>
+      <div class="row"><span>Exit node</span><b id="geo">scanning…</b></div>
+      <div class="row"><span>ISP</span><b id="isp">—</b></div>
+      <div class="row"><span>Samples in window</span><b id="samp">0</b></div>
+      <div class="warn">Geo is read from your real IP. A Kenyan node lowers ping to Betika/SportPesa servers — it does not change crash results.</div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Bookmaker</div>
+      <div class="tg" id="sites"></div>
+    </div>
+
+    <div class="card edge">
+      <div class="lbl">Next cash-out target</div>
+      <div class="big xt" id="tgt">1.50x</div>
+      <div class="chip mid" id="verdict">—</div>
+      <div class="row" style="margin-top:12px"><span>Confidence</span><b id="conf">—</b></div>
+      <div class="row"><span>Stake this round</span><b id="stakeOut">—</b></div>
+      <div class="row"><span>Win if hit</span><b style="color:var(--acc)" id="winOut">—</b></div>
+      <div class="bar" style="margin-top:9px"><i id="confBar" style="width:0%"></i></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Live sparkline · last 30</div>
+      <svg id="spark" viewBox="0 0 300 60" preserveAspectRatio="none"
+        style="width:100%;height:60px;display:block">
+        <polyline id="poly" fill="none" stroke="#00ffa3" stroke-width="2"
+          stroke-linejoin="round" points=""/>
+      </svg>
+      <div class="warn" id="sparkNote">Log rounds and the trace draws itself.</div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div id="tLog" class="hide">
+    <div class="card">
+      <div class="lbl">Log the crash that just happened</div>
+      <div class="pad" id="pad"></div>
+      <div class="add">
+        <input id="custom" type="number" step="0.01" min="1" inputmode="decimal" placeholder="exact value">
+        <button id="addBtn">ADD</button>
+      </div>
+      <div class="row" style="margin-top:11px"><span>Money tracking</span>
+        <b id="moneyState">ON</b></div>
+      <button class="ghost" id="toggleMoney" style="margin-top:9px">Toggle money tracking</button>
+    </div>
+    <div class="card">
+      <div class="lbl">Recent rounds</div>
+      <div class="hist" id="hist"><span style="background:none;color:var(--dim)">nothing logged</span></div>
+    </div>
+    <button class="ghost" id="undo">Undo last round</button>
+  </div>
+
+  <!-- MONEY -->
+  <div id="tMoney" class="hide">
+    <div class="card edge">
+      <div class="lbl">Bankroll</div>
+      <div class="big" id="bank">—</div>
+      <div class="chip" id="pnlChip">—</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Risk setting</div>
+      <div class="row"><span>Stake</span><b id="stakeView">—</b></div>
+      <div class="row"><span>% of bankroll</span><b id="stakePct">—</b></div>
+      <div class="row"><span>Max drawdown seen</span><b id="dd">—</b></div>
+      <input type="range" id="stakeSlider" min="10" max="500" step="10" style="margin-top:12px">
+      <div class="warn">Keep stake at 2–5% of bankroll. Above 10% one bad streak wipes you and you start over broke — that is how poverty stays.</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Compounding projection</div>
+      <div class="row"><span>Rounds to double</span><b id="dbl">—</b></div>
+      <div class="row"><span>Rounds to 10x</span><b id="tenx">—</b></div>
+      <div class="warn">At your current target and stake, this is how long the maths says the climb takes. Slow is normal. Slow is the point.</div>
+    </div>
+    <button class="ghost" id="resetBank">Reset bankroll to start</button>
+  </div>
+
+  <!-- STATS -->
+  <div id="tStat" class="hide">
+    <div class="card">
+      <div class="lbl">Your real numbers</div>
+      <div class="row"><span>Rounds logged</span><b id="n">0</b></div>
+      <div class="row"><span>Mean crash</span><b id="mean">—</b></div>
+      <div class="row"><span>Median crash</span><b id="med">—</b></div>
+      <div class="row"><span>Hit 1.50x</span><b id="h15">—</b></div>
+      <div class="row"><span>Hit 2.00x</span><b id="h20">—</b></div>
+      <div class="row"><span>Longest cold run</span><b id="cold">—</b></div>
+    </div>
+    <div class="card"><div class="lbl">Distribution</div><div id="dist"></div></div>
+    <div class="card">
+      <div class="lbl">Model check</div>
+      <div class="warn" id="check">—</div>
+    </div>
+    <button class="ghost" id="resetAll">Clear everything</button>
+  </div>
+
+  <div class="tabs">
+    <button class="on" data-t="tHome">Home</button>
+    <button data-t="tLog">Log</button>
+    <button data-t="tMoney">Money</button>
+    <button data-t="tStat">Stats</button>
+  </div>
+</div>
+</div>
+
+<script>
+const K='crashlab_pro_v1';
+let S=JSON.parse(localStorage.getItem(K)||'null')||{
+  name:'',bank:1000,startBank:1000,stake:50,site:'Betika',
+  rtp:0.97,target:1.5,rounds:[],money:true,peak:1000,trough:1000
+};
+const save=()=>localStorage.setItem(K,JSON.stringify(S));
+const cl=(v,a,b)=>Math.min(b,Math.max(a,v));
+const p=x=>cl(S.rtp/x,0,1);
+const pc=v=>(v*100).toFixed(1)+'%';
+const fmt=n=>Math.round(n).toLocaleString('en-KE');
+const SITES=['Betika','SportPesa','Odibets','Betway','1xBet','Melbet','MegaPari','Premier Bet'];
+
+function beep(f,d){
+  try{
+    const a=new (window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.frequency.value=f;o.type='sine';
+    g.gain.setValueAtTime(.07,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);
+    o.start();o.stop(a.currentTime+d);
+  }catch(e){}
+}
+
+function render(){
+  if(!S.name) return;
+  document.getElementById('whoami').textContent=
+    S.name.toUpperCase()+' · '+S.site+' · AVIATOR';
+  const pv=p(S.target);
+  document.getElementById('tgt').textContent=S.target.toFixed(2)+'x';
+  document.getElementById('conf').textContent=pc(pv);
+  document.getElementById('confBar').style.width=(pv*100)+'%';
+  document.getElementById('stakeOut').textContent='KES '+fmt(S.stake);
+  document.getElementById('winOut').textContent='KES '+fmt(S.stake*(S.target-1));
+  const v=document.getElementById('verdict');
+  if(pv>=.85){v.className='chip ok';v.textContent='SAFE ZONE — cash out, repeat'}
+  else if(pv>=.55){v.className='chip mid';v.textContent='BALANCED — normal risk'}
+  else if(pv>=.30){v.className='chip no';v.textContent='GREEDY — will miss a lot'}
+  else{v.className='chip no';v.textContent='LOTTERY — rare hit'}
+  document.getElementById('samp').textContent=S.rounds.length;
+
+  document.getElementById('bank').textContent='KES '+fmt(S.bank);
+  document.getElementById('stakeView').textContent='KES '+fmt(S.stake);
+  document.getElementById('stakePct').textContent=
+    S.bank>0?(S.stake/S.bank*100).toFixed(1)+'%':'—';
+  const pl=S.bank-S.startBank;
+  const pcEl=document.getElementById('pnlChip');
+  pcEl.className='chip '+(pl>=0?'ok':'no');
+  pcEl.textContent=(pl>=0?'+':'')+'KES '+fmt(pl)+' ('+(pl>=0?'PROFIT':'LOSS')+')';
+  document.getElementById('dd').textContent=
+    'KES '+fmt(Math.max(0,S.peak-S.trough));
+  const e=pv>0?Math.log(2)/Math.log(1+pv*(S.target-1)):0;
+  const e10=pv>0?Math.log(10)/Math.log(1+pv*(S.target-1)):0;
+  document.getElementById('dbl').textContent=e?Math.ceil(e)+' rounds':'never';
+  document.getElementById('tenx').textContent=e10?Math.ceil(e10)+' rounds':'never';
+  document.getElementById('moneyState').textContent=S.money?'ON':'OFF';
+
+  const r=S.rounds;
+  document.getElementById('n').textContent=r.length;
+  if(r.length){
+    const s=[...r].sort((a,b)=>a-b);
+    document.getElementById('mean').textContent=(r.reduce((a,b)=>a+b,0)/r.length).toFixed(2)+'x';
+    document.getElementById('med').textContent=s[Math.floor(s.length/2)].toFixed(2)+'x';
+    document.getElementById('h15').textContent=pc(r.filter(x=>x>=1.5).length/r.length);
+    document.getElementById('h20').textContent=pc(r.filter(x=>x>=2).length/r.length);
+    let run=0,best=0;
+    [...r].reverse().forEach(x=>{if(x<1.2){run++;best=Math.max(best,run)}else run=0});
+    document.getElementById('cold').textContent=best;
+    const act=r.filter(x=>x>=1.5).length/r.length;
+    document.getElementById('check').textContent=
+      'Model says 1.50x should hit 64.7% of the time. Yours is hitting '+pc(act)+
+      ' over '+r.length+' rounds. Under 30 rounds it will look wild — that is noise, not a broken model.';
+  }else{
+    ['mean','med','h15','h20','cold'].forEach(i=>document.getElementById(i).textContent='—');
+    document.getElementById('check').textContent='Log 30+ rounds to compare against the model.';
+  }
+
+  document.getElementById('hist').innerHTML=r.length?r.slice(0,50).map(x=>
+    `<span class="${x>=2?'hi':x<1.2?'lo':''}">${x.toFixed(2)}x</span>`).join('')
+    :'<span style="background:none;color:var(--dim)">nothing logged</span>';
+
+  const pts=r.slice(0,30).reverse().map((x,i)=>
+    `${(i/(Math.max(r.slice(0,30).length-1,1)))*300},${60-cl(x,1,6)/6*56}`).join(' ');
+  document.getElementById('poly').setAttribute('points',pts);
+  document.getElementById('poly').setAttribute('stroke',r.length&&r[0]>=1.5?'#00ffa3':'#ff4d6d');
+
+  const B=[['under 1.20x',x=>x<1.2],['1.20–1.50x',x=>x>=1.2&&x<1.5],
+    ['1.50–2.00x',x=>x>=1.5&&x<2],['2.00–3.00x',x=>x>=2&&x<3],
+    ['3.00–5.00x',x=>x>=3&&x<5],['5.00–10x',x=>x>=5&&x<10],['10x+',x=>x>=10]];
+  document.getElementById('dist').innerHTML=B.map(([l,f])=>{
+    const c=r.filter(f).length,q=r.length?c/r.length*100:0;
+    return `<div class="dist"><div class="top"><span>${l}</span>
+      <span>${c} · ${q.toFixed(0)}%</span></div>
+      <div class="bar"><i style="width:${q}%"></i></div></div>`;
+  }).join('');
+  save();
+}
+
+function add(v){
+  if(!v||v<1) return;
+  v=+v.toFixed(2);
+  if(S.money){
+    if(v>=S.target){
+      S.bank+=S.stake*(S.target-1);beep(880,.12);
+    }else{
+      S.bank-=S.stake;beep(220,.18);
+    }
+    S.peak=Math.max(S.peak,S.bank);
+    S.trough=Math.min(S.trough,S.bank);
+  }
+  S.rounds.unshift(v);
+  if(S.rounds.length>600) S.rounds.pop();
+  render();
+}
+
+document.getElementById('aGo').onclick=()=>{
+  const n=document.getElementById('aName').value.trim();
+  const b=+document.getElementById('aBank').value;
+  const st=+document.getElementById('aStake').value;
+  if(!n) return alert('Enter a name');
+  if(!b||b<10) return alert('Enter a bankroll');
+  if(!st||st<1) return alert('Enter a stake');
+  S.name=n;S.bank=b;S.startBank=b;S.stake=st;S.peak=b;S.trough=b;
+  document.getElementById('auth').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  save();render();
+  fetch('https://ipwho.is/').then(r=>r.json()).then(d=>{
+    if(!d.success) throw 0;
+    document.getElementById('geo').textContent=d.country_code+' · '+d.city;
+    document.getElementById('geo').style.color=d.country_code==='KE'?'var(--acc)':'var(--warn)';
+    document.getElementById('isp').textContent=d.connection?.isp||'—';
+  }).catch(()=>{
+    document.getElementById('geo').textContent='offline';
+    document.getElementById('geo').style.color='var(--warn)';
+  });
+  beep(660,.1);
+};
+
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  ['tHome','tLog','tMoney','tStat'].forEach(t=>
+    document.getElementById(t).classList.toggle('hide',t!==b.dataset.t));
+});
+
+document.getElementById('sites').innerHTML=SITES.map(s=>
+  `<button data-s="${s}" class="${s===S.site?'on':''}">${s}</button>`).join('');
+document.querySelectorAll('#sites button').forEach(b=>b.onclick=()=>{
+  S.site=b.dataset.s;
+  document.querySelectorAll('#sites button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');render();
+});
+
+document.getElementById('pad').innerHTML=[1.00,1.10,1.20,1.50,1.80,2.00,3.00,5.00]
+  .map(v=>`<button data-v="${v}">${v.toFixed(2)}</button>`).join('');
+document.querySelectorAll('#pad button').forEach(b=>
+  b.onclick=()=>add(+b.dataset.v));
+
+document.getElementById('addBtn').onclick=()=>{
+  const i=document.getElementById('custom');
+  add(parseFloat(i.value));i.value='';i.blur();
+};
+document.getElementById('undo').onclick=()=>{S.rounds.shift();render()};
+document.getElementById('toggleMoney').onclick=()=>{S.money=!S.money;render()};
+document.getElementById('stakeSlider').value=S.stake;
+document.getElementById('stakeSlider').oninput=e=>{S.stake=+e.target.value;render()};
+document.getElementById('resetBank').onclick=()=>{
+  S.bank=S.startBank;S.peak=S.startBank;S.trough=S.startBank;render();
+};
+document.getElementById('resetAll').onclick=()=>{
+  if(confirm('Wipe all data and start over?')){
+    localStorage.removeItem(K);location.reload();
+  }
+};
+
+if(S.name){
+  document.getElementById('auth').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  render();
+}
+</script>
+</body>
+</html>
